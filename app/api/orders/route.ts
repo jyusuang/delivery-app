@@ -2,6 +2,16 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
+type OrderRequestItem = {
+  menuId: number;
+  quantity: number;
+};
+
+type MenuForOrder = {
+  id: number;
+  price: number;
+};
+
 export async function GET() {
   try {
     const cookieStore = await cookies();
@@ -56,7 +66,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const { items } = await request.json();
+    const body = await request.json();
+    const items: OrderRequestItem[] = body.items;
 
     if (!items || items.length === 0) {
       return NextResponse.json(
@@ -65,30 +76,31 @@ export async function POST(request: Request) {
       );
     }
 
-    const menuIds = items.map((item: { menuId: number }) => item.menuId);
+    const menuIds = items.map((item) => item.menuId);
 
-    const menus = await prisma.menu.findMany({
+    const menus: MenuForOrder[] = await prisma.menu.findMany({
       where: {
         id: {
           in: menuIds,
         },
       },
+      select: {
+        id: true,
+        price: true,
+      },
     });
 
-    const totalPrice = items.reduce(
-      (sum: number, item: { menuId: number; quantity: number }) => {
-        const menu = menus.find((m) => m.id === item.menuId);
-        return sum + (menu?.price || 0) * item.quantity;
-      },
-      0
-    );
+    const totalPrice = items.reduce((sum, item) => {
+      const menu = menus.find((m: MenuForOrder) => m.id === item.menuId);
+      return sum + (menu?.price || 0) * item.quantity;
+    }, 0);
 
     const order = await prisma.order.create({
       data: {
         userId: Number(userId),
         totalPrice,
         items: {
-          create: items.map((item: { menuId: number; quantity: number }) => ({
+          create: items.map((item) => ({
             menuId: item.menuId,
             quantity: item.quantity,
           })),
