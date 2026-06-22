@@ -1,7 +1,12 @@
 import { cookies } from "next/headers";
 import { prisma } from "./prisma";
 
-export async function getCurrentUser() {
+export type CurrentUser = {
+  id: number;
+  email: string;
+} | null;
+
+export async function getCurrentUser(): Promise<CurrentUser> {
   const cookieStore = await cookies();
   const userId = cookieStore.get("userId")?.value;
 
