@@ -13,21 +13,6 @@ type OrderRequestBody = {
   items?: OrderRequestItem[];
 };
 
-type MenuForPrice = {
-  id: number;
-  price: number;
-};
-
-function isValidOrderItem(item: OrderRequestItem): boolean {
-  return (
-    typeof item.menuId === "number" &&
-    Number.isInteger(item.menuId) &&
-    typeof item.quantity === "number" &&
-    Number.isInteger(item.quantity) &&
-    item.quantity > 0
-  );
-}
-
 export async function GET() {
   try {
     const cookieStore = await cookies();
@@ -60,12 +45,12 @@ export async function GET() {
       },
     });
 
-    const safeOrders = orders.map((order) => ({
+    const safeOrders = orders.map((order: any) => ({
       id: order.id,
       totalPrice: order.totalPrice,
       status: order.status,
       createdAt: order.createdAt.toISOString(),
-      items: order.items.map((item) => ({
+      items: order.items.map((item: any) => ({
         id: item.id,
         quantity: item.quantity,
         menu: {
@@ -116,18 +101,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const hasInvalidItem = items.some((item) => !isValidOrderItem(item));
+    const menuIds = items.map((item: OrderRequestItem) => item.menuId);
 
-    if (hasInvalidItem) {
-      return NextResponse.json(
-        { message: "주문 데이터가 올바르지 않습니다." },
-        { status: 400 }
-      );
-    }
-
-    const menuIds = items.map((item) => item.menuId);
-
-    const menus: MenuForPrice[] = await prisma.menu.findMany({
+    const menus = await prisma.menu.findMany({
       where: {
         id: {
           in: menuIds,
@@ -139,27 +115,23 @@ export async function POST(request: Request) {
       },
     });
 
-    if (menus.length !== menuIds.length) {
-      return NextResponse.json(
-        { message: "존재하지 않는 메뉴가 포함되어 있습니다." },
-        { status: 400 }
-      );
-    }
+    const totalPrice = items.reduce(
+      (sum: number, item: OrderRequestItem) => {
+        const menu = menus.find((menuItem: any) => {
+          return menuItem.id === item.menuId;
+        });
 
-    const totalPrice = items.reduce((sum: number, item: OrderRequestItem) => {
-      const menu = menus.find((menuItem: MenuForPrice) => {
-        return menuItem.id === item.menuId;
-      });
-
-      return sum + (menu?.price ?? 0) * item.quantity;
-    }, 0);
+        return sum + (menu?.price ?? 0) * item.quantity;
+      },
+      0
+    );
 
     const order = await prisma.order.create({
       data: {
         userId: Number(userId),
         totalPrice,
         items: {
-          create: items.map((item) => ({
+          create: items.map((item: OrderRequestItem) => ({
             menuId: item.menuId,
             quantity: item.quantity,
           })),
@@ -181,7 +153,7 @@ export async function POST(request: Request) {
         totalPrice: order.totalPrice,
         status: order.status,
         createdAt: order.createdAt.toISOString(),
-        items: order.items.map((item) => ({
+        items: order.items.map((item: any) => ({
           id: item.id,
           quantity: item.quantity,
           menu: {
