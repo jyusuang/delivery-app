@@ -1,26 +1,169 @@
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  margin: 0;
+  background: #f6f6f6;
+  color: #222;
   font-family: Arial, Helvetica, sans-serif;
+}
+
+button {
+  border: none;
+  background: #ff6b00;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+
+.hero {
+  background: linear-gradient(135deg, #ff6b00, #ffb000);
+  color: white;
+  padding: 36px;
+  border-radius: 24px;
+  margin-bottom: 20px;
+}
+
+.hero h1 {
+  margin: 10px 0;
+  font-size: 42px;
+}
+
+.hero p {
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.25);
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.message {
+  background: #222;
+  color: white;
+  padding: 14px 18px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+}
+
+.restaurant-list {
+  display: grid;
+  gap: 10px;
+}
+
+.restaurant-list button {
+  background: #eeeeee;
+  color: #222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.restaurant-list button.selected {
+  background: #ff6b00;
+  color: white;
+}
+
+.restaurant-list span {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.menu-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #eeeeee;
+  padding: 14px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+}
+
+.menu-row p {
+  margin: 6px 0 0;
+  color: #666;
+}
+
+.order-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.order-card {
+  border: 1px solid #eeeeee;
+  border-radius: 14px;
+  padding: 16px;
+  background: #fafafa;
+}
+
+.order-card h3 {
+  margin-top: 0;
+}
+
+@media (max-width: 760px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero h1 {
+    font-size: 32px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
 }
