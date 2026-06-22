@@ -5,6 +5,20 @@ import { getCurrentUser } from "@/lib/auth";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+type MenuFromDb = {
+  id: number;
+  name: string;
+  price: number;
+  restaurantId: number;
+};
+
+type RestaurantFromDb = {
+  id: number;
+  name: string;
+  category: string;
+  menus: MenuFromDb[];
+};
+
 export default async function Home() {
   const restaurantsFromDb = await prisma.restaurant.findMany({
     include: {
@@ -19,11 +33,11 @@ export default async function Home() {
     },
   });
 
-  const restaurants = restaurantsFromDb.map((restaurant) => ({
+  const restaurants = restaurantsFromDb.map((restaurant: RestaurantFromDb) => ({
     id: restaurant.id,
     name: restaurant.name,
     category: restaurant.category,
-    menus: restaurant.menus.map((menu) => ({
+    menus: restaurant.menus.map((menu: MenuFromDb) => ({
       id: menu.id,
       name: menu.name,
       price: menu.price,
